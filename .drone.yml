@@ -1,0 +1,55 @@
+kind: pipeline
+type: docker
+name: default
+
+workspace:
+  base: /go/src/github.com/carldanley/homelab-hue
+
+platform:
+  os: linux
+  arch: amd64
+
+volumes:
+- name: gopath
+  temp: {}
+
+steps:
+- name: lint-code
+  image: golang
+  commands:
+  - go get -u golang.org/x/lint/golint
+  - golint -set_exit_status ./
+  volumes:
+  - name: gopath
+    path: /go
+
+- name: build
+  image: golang
+  environment:
+    CGO_ENABLED: 0
+    GOOS: linux
+  commands:
+  - go build -a -installsuffix cgo -o homelab-hue
+  volumes:
+  - name: gopath
+    path: /go
+  when:
+    ref:
+    - refs/tags/*
+  depends_on:
+  - lint-code
+
+- name: dockerize
+  image: plugins/docker
+  settings:
+    auto_tag: true
+    repo: carldanley/homelab-hue
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+  when:
+    ref:
+    - refs/tags/*
+  depends_on:
+  - build
