@@ -45,7 +45,7 @@ var (
 			Name: "hue_sensor_state",
 			Help: "The instantaneous value of various HUE sensors",
 		},
-		[]string{"name", "state"},
+		[]string{"name", "state", "type"},
 	)
 )
 

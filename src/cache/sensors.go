@@ -169,18 +169,20 @@ func (hcs *HueCacheSystem) convertTemperatureToFahrenheit(temperature float64) f
 }
 
 func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor HueSensor) {
-	metrics.HueSensorStateGauge.With(prometheus.Labels{
-		"name":  sensor.Name,
-		"state": "battery",
-	}).Set(sensor.Battery)
-
 	switch sensorType {
 	case SENSOR_TYPE_LIGHT_LEVEL:
 
 		metrics.HueSensorStateGauge.With(prometheus.Labels{
 			"name":  sensor.Name,
 			"state": "light_level",
+			"type":  "light",
 		}).Set(sensor.LightLevel)
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "battery",
+			"type":  "light",
+		}).Set(sensor.Battery)
 
 	case SENSOR_TYPE_PRESENCE:
 
@@ -192,14 +194,28 @@ func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor Hu
 		metrics.HueSensorStateGauge.With(prometheus.Labels{
 			"name":  sensor.Name,
 			"state": "presence",
+			"type":  "presence",
 		}).Set(presenceDetected)
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "battery",
+			"type":  "presence",
+		}).Set(sensor.Battery)
 
 	case SENSOR_TYPE_TEMPERATURE:
 
 		metrics.HueSensorStateGauge.With(prometheus.Labels{
 			"name":  sensor.Name,
 			"state": "temperature",
+			"type":  "temperature",
 		}).Set(sensor.Temperature)
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "battery",
+			"type":  "temperature",
+		}).Set(sensor.Battery)
 
 	}
 }
