@@ -9,4 +9,4 @@ ENV ZONEINFO /zoneinfo.zip
 WORKDIR /
 ADD homelab-hue /bin/
 
-CMD [ "homelab-hue" ]
+CMD [ "/bin/homelab-hue" ]
