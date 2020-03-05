@@ -9,6 +9,7 @@ import (
 	"github.com/carldanley/homelab-hue/src/cache"
 	"github.com/carldanley/homelab-hue/src/config"
 	"github.com/carldanley/homelab-hue/src/events"
+	"github.com/carldanley/homelab-hue/src/metrics"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,6 +52,7 @@ func main() {
 	defer hueCacheSystem.Shutdown()
 
 	// begin processing events
+	go metrics.Startup(cfg.MetricsPort, log)
 	go eventSystem.Startup()
 	go hueCacheSystem.Startup()
 

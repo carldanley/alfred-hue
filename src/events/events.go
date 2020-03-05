@@ -1,10 +1,13 @@
 package events
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/carldanley/homelab-hue/src/config"
+	"github.com/carldanley/homelab-hue/src/metrics"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,6 +66,21 @@ func (es *EventSystem) Startup() {
 
 		if err := es.bus.Publish(event.Name, []byte(event.JSONPayload)); err != nil {
 			es.log.WithError(err).Warn("could not publish event to event bus")
+		} else {
+			isLight, _ := regexp.Match(`^hue.light.*`, []byte(event.Name))
+			isSensor, _ := regexp.Match(`^hue.sensor.*`, []byte(event.Name))
+
+			if isLight {
+				metrics.HueEventsEmittedCounter.With(prometheus.Labels{
+					"event": event.Name,
+					"type":  "light",
+				}).Inc()
+			} else if isSensor {
+				metrics.HueEventsEmittedCounter.With(prometheus.Labels{
+					"event": event.Name,
+					"type":  "sensor",
+				}).Inc()
+			}
 		}
 	}
 }

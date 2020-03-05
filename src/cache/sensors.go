@@ -2,6 +2,8 @@ package cache
 
 import (
 	"github.com/amimof/huego"
+	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func (hcs *HueCacheSystem) updateSensors() error {
@@ -19,6 +21,8 @@ func (hcs *HueCacheSystem) updateSensors() error {
 		old, err := hcs.GetSensorById(sensor.ID)
 		json := new.ToJSON()
 
+		hcs.recordSensorStateMetrics(sensor.Type, new)
+
 		if err != nil {
 			hcs.sensors[new.ID] = new
 			continue
@@ -34,8 +38,20 @@ func (hcs *HueCacheSystem) updateSensors() error {
 
 		if new.On != old.On {
 			if new.On {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "sensor",
+					"state": "on",
+				}).Inc()
+
 				hcs.events.Publish("hue.sensor.on", json)
 			} else {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "sensor",
+					"state": "off",
+				}).Inc()
+
 				hcs.events.Publish("hue.sensor.off", json)
 			}
 		}
@@ -46,8 +62,20 @@ func (hcs *HueCacheSystem) updateSensors() error {
 
 		if new.Reachable != old.Reachable {
 			if new.Reachable {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "sensor",
+					"state": "reachable",
+				}).Inc()
+
 				hcs.events.Publish("hue.sensor.reachable", json)
 			} else {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "sensor",
+					"state": "unreachable",
+				}).Inc()
+
 				hcs.events.Publish("hue.sensor.unreachable", json)
 			}
 		}
@@ -138,4 +166,40 @@ func (hcs *HueCacheSystem) bool(value interface{}) bool {
 
 func (hcs *HueCacheSystem) convertTemperatureToFahrenheit(temperature float64) float64 {
 	return ((temperature / 100.0) * 1.8) + 32.0
+}
+
+func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor HueSensor) {
+	metrics.HueSensorStateGauge.With(prometheus.Labels{
+		"name":  sensor.Name,
+		"state": "battery",
+	}).Set(sensor.Battery)
+
+	switch sensorType {
+	case SENSOR_TYPE_LIGHT_LEVEL:
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "light_level",
+		}).Set(sensor.LightLevel)
+
+	case SENSOR_TYPE_PRESENCE:
+
+		presenceDetected := 0.0
+		if sensor.Presence {
+			presenceDetected = 1.0
+		}
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "presence",
+		}).Set(presenceDetected)
+
+	case SENSOR_TYPE_TEMPERATURE:
+
+		metrics.HueSensorStateGauge.With(prometheus.Labels{
+			"name":  sensor.Name,
+			"state": "temperature",
+		}).Set(sensor.Temperature)
+
+	}
 }

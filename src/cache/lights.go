@@ -2,6 +2,8 @@ package cache
 
 import (
 	"github.com/amimof/huego"
+	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func (hcs *HueCacheSystem) updateLights() error {
@@ -30,22 +32,46 @@ func (hcs *HueCacheSystem) updateLights() error {
 
 		if new.On != old.On {
 			if new.On {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "light",
+					"state": "on",
+				}).Inc()
+
 				hcs.events.Publish("hue.light.on", json)
 			} else {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "light",
+					"state": "off",
+				}).Inc()
+
 				hcs.events.Publish("hue.light.off", json)
 			}
 		}
 
 		if new.Reachable != old.Reachable {
 			if new.Reachable {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "light",
+					"state": "reachable",
+				}).Inc()
+
 				hcs.events.Publish("hue.light.reachable", json)
 			} else {
+				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+					"name":  new.Name,
+					"type":  "light",
+					"state": "unreachable",
+				}).Inc()
+
 				hcs.events.Publish("hue.light.unreachable", json)
 			}
 		}
 
 		if new.Brightness != old.Brightness {
-			hcs.events.Publish("hue.light.on", json)
+			hcs.events.Publish("hue.light.brightness", json)
 		}
 
 		if new.Hue != old.Hue {

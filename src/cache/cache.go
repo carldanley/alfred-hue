@@ -7,6 +7,8 @@ import (
 	"github.com/amimof/huego"
 	"github.com/carldanley/homelab-hue/src/config"
 	"github.com/carldanley/homelab-hue/src/events"
+	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
@@ -40,14 +42,23 @@ func (hcs *HueCacheSystem) Startup() {
 		startTime := time.Now()
 
 		if err := hcs.updateLights(); err != nil {
+			metrics.HueCacheUpdateErrorsCounter.WithLabelValues(prometheus.Labels{
+				"type": "lights",
+			}).Inc()
+
 			hcs.log.WithError(err).Warn("could not update lights")
 		}
 
 		if err := hcs.updateSensors(); err != nil {
+			metrics.HueCacheUpdateErrorsCounter.WithLabelValues(prometheus.Labels{
+				"type": "sensors",
+			}).Inc()
+
 			hcs.log.WithError(err).Warn("could not update sensors")
 		}
 
 		elapsedTime := time.Since(startTime).Milliseconds()
+		metrics.HueCacheUpdateLatencyMSHistogram.Observe(float64(elapsedTime))
 		if elapsedTime < CACHE_SYNC_INTERVAL_MS {
 			time.Sleep(time.Millisecond * time.Duration(CACHE_SYNC_INTERVAL_MS-elapsedTime))
 		}

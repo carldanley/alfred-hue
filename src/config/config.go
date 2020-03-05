@@ -1,23 +1,33 @@
 package config
 
-import "os"
+import (
+	"os"
+	"strconv"
+)
 
 type Config struct {
 	NatsServer       string
 	HueBridgeAddress string
 	HueUserID        string
+	MetricsPort      int
 }
 
 func GetConfig() (Config, error) {
-	cfg := Config{}
+	cfg := Config{
+		NatsServer:       os.Getenv("NATS_SERVER"),
+		HueBridgeAddress: os.Getenv("HUE_BRIDGE_ADDRESS"),
+		HueUserID:        os.Getenv("HUE_USER_ID"),
+		MetricsPort:      9200,
+	}
 
-	cfg.NatsServer = os.Getenv("NATS_SERVER")
 	if cfg.NatsServer == "" {
 		cfg.NatsServer = "nats://127.0.0.1:4222"
 	}
 
-	cfg.HueBridgeAddress = os.Getenv("HUE_BRIDGE_ADDRESS")
-	cfg.HueUserID = os.Getenv("HUE_USER_ID")
+	metricsPort, err := strconv.Atoi(os.Getenv("METRICS_PORT"))
+	if err == nil {
+		cfg.MetricsPort = metricsPort
+	}
 
 	return cfg, nil
 }
