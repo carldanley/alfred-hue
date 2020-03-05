@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hue
+  namespace: homelab
+  labels:
+    app: hue
+spec:
+  selector:
+    matchLabels:
+      app: hue
+  replicas: 1
+  minReadySeconds: 5
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hue
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9200"
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      containers:
+      - name: homelab-hue
+        image: carldanley/homelab-hue:1
+        imagePullPolicy: Always
+        args:
+        - -v=2
+        ports:
+        - containerPort: 9200
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 9200
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 9200
+        env:
+        - name: NATS_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: hue
+              key: nats-server
+        - name: HUE_BRIDGE_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: hue
+              key: hue-bridge-address
+        - name: HUE_USER_ID
+          valueFrom:
+            secretKeyRef:
+              name: hue
+              key: hue-user-id
+        - name: METRICS_PORT
+          value: "9200"

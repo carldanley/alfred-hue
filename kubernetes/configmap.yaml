@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hue
+  namespace: homelab
+  labels:
+    app: hue
+data:
+  hue-bridge-address: "1.2.3.4" # update this to hostname or IP of the hue bridge this service will connect to
