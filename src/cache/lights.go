@@ -17,6 +17,8 @@ func (hcs *HueCacheSystem) updateLights() error {
 		old, err := hcs.GetLightById(light.ID)
 		json := new.ToJSON()
 
+		hcs.recordDeviceStateChangeCounter(new)
+
 		if err != nil {
 			hcs.lights[new.ID] = new
 			continue
@@ -32,40 +34,16 @@ func (hcs *HueCacheSystem) updateLights() error {
 
 		if new.On != old.On {
 			if new.On {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "light",
-					"state": "on",
-				}).Inc()
-
 				hcs.events.Publish("hue.light.on", json)
 			} else {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "light",
-					"state": "off",
-				}).Inc()
-
 				hcs.events.Publish("hue.light.off", json)
 			}
 		}
 
 		if new.Reachable != old.Reachable {
 			if new.Reachable {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "light",
-					"state": "reachable",
-				}).Inc()
-
 				hcs.events.Publish("hue.light.reachable", json)
 			} else {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "light",
-					"state": "unreachable",
-				}).Inc()
-
 				hcs.events.Publish("hue.light.unreachable", json)
 			}
 		}
@@ -136,5 +114,35 @@ func (hcs *HueCacheSystem) convertHuegoLightToHueLight(light huego.Light) HueLig
 		Effect:           light.State.Effect,
 		TransitionTime:   light.State.TransitionTime,
 		ColorMode:        light.State.ColorMode,
+	}
+}
+
+func (hcs *HueCacheSystem) recordDeviceStateChangeCounter(light HueLight) {
+	if light.On {
+		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+			"name":  light.Name,
+			"type":  "light",
+			"state": "on",
+		}).Inc()
+	} else {
+		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+			"name":  light.Name,
+			"type":  "light",
+			"state": "off",
+		}).Inc()
+	}
+
+	if light.Reachable {
+		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+			"name":  light.Name,
+			"type":  "light",
+			"state": "reachable",
+		}).Inc()
+	} else {
+		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
+			"name":  light.Name,
+			"type":  "light",
+			"state": "unreachable",
+		}).Inc()
 	}
 }
