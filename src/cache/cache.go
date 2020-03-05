@@ -42,7 +42,7 @@ func (hcs *HueCacheSystem) Startup() {
 		startTime := time.Now()
 
 		if err := hcs.updateLights(); err != nil {
-			metrics.HueCacheUpdateErrorsCounter.WithLabelValues(prometheus.Labels{
+			metrics.HueCacheUpdateErrorsCounter.With(prometheus.Labels{
 				"type": "lights",
 			}).Inc()
 
@@ -50,7 +50,7 @@ func (hcs *HueCacheSystem) Startup() {
 		}
 
 		if err := hcs.updateSensors(); err != nil {
-			metrics.HueCacheUpdateErrorsCounter.WithLabelValues(prometheus.Labels{
+			metrics.HueCacheUpdateErrorsCounter.With(prometheus.Labels{
 				"type": "sensors",
 			}).Inc()
 
