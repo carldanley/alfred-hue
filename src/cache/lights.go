@@ -118,31 +118,25 @@ func (hcs *HueCacheSystem) convertHuegoLightToHueLight(light huego.Light) HueLig
 }
 
 func (hcs *HueCacheSystem) recordDeviceStateChangeCounter(light HueLight) {
+	isOn := 0.0
 	if light.On {
-		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-			"name":  light.Name,
-			"type":  "light",
-			"state": "on",
-		}).Inc()
-	} else {
-		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-			"name":  light.Name,
-			"type":  "light",
-			"state": "off",
-		}).Inc()
+		isOn = 1.0
 	}
 
+	isReachable := 0.0
 	if light.Reachable {
-		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-			"name":  light.Name,
-			"type":  "light",
-			"state": "reachable",
-		}).Inc()
-	} else {
-		metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-			"name":  light.Name,
-			"type":  "light",
-			"state": "unreachable",
-		}).Inc()
+		isReachable = 1.0
 	}
+
+	metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+		"name":  light.Name,
+		"type":  "light",
+		"state": "on",
+	}).Set(isOn)
+
+	metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+		"name":  light.Name,
+		"type":  "light",
+		"state": "reachable",
+	}).Set(isReachable)
 }

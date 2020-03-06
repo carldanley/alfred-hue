@@ -38,20 +38,8 @@ func (hcs *HueCacheSystem) updateSensors() error {
 
 		if new.On != old.On {
 			if new.On {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "sensor",
-					"state": "on",
-				}).Inc()
-
 				hcs.events.Publish("hue.sensor.on", json)
 			} else {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "sensor",
-					"state": "off",
-				}).Inc()
-
 				hcs.events.Publish("hue.sensor.off", json)
 			}
 		}
@@ -62,20 +50,8 @@ func (hcs *HueCacheSystem) updateSensors() error {
 
 		if new.Reachable != old.Reachable {
 			if new.Reachable {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "sensor",
-					"state": "reachable",
-				}).Inc()
-
 				hcs.events.Publish("hue.sensor.reachable", json)
 			} else {
-				metrics.HueDeviceStateChangeCounter.With(prometheus.Labels{
-					"name":  new.Name,
-					"type":  "sensor",
-					"state": "unreachable",
-				}).Inc()
-
 				hcs.events.Publish("hue.sensor.unreachable", json)
 			}
 		}
@@ -169,53 +145,111 @@ func (hcs *HueCacheSystem) convertTemperatureToFahrenheit(temperature float64) f
 }
 
 func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor HueSensor) {
+	isOn := 0.0
+	if sensor.On {
+		isOn = 1.0
+	}
+
+	isReachable := 0.0
+	if sensor.Reachable {
+		isReachable = 1.0
+	}
+
+	presenceDetected := 0.0
+	if sensor.Presence {
+		presenceDetected = 1.0
+	}
+
 	switch sensorType {
 	case SENSOR_TYPE_LIGHT_LEVEL:
 
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "light_level",
-			"type":  "light",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "light_level",
+			"type":       "sensor",
+			"sensorType": "light_level",
 		}).Set(sensor.LightLevel)
 
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "battery",
-			"type":  "light",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "battery",
+			"type":       "sensor",
+			"sensorType": "light_level",
 		}).Set(sensor.Battery)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "on",
+			"type":       "sensor",
+			"sensorType": "light_level",
+		}).Set(isOn)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "reachable",
+			"type":       "sensor",
+			"sensorType": "light_level",
+		}).Set(isReachable)
 
 	case SENSOR_TYPE_PRESENCE:
 
-		presenceDetected := 0.0
-		if sensor.Presence {
-			presenceDetected = 1.0
-		}
-
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "presence",
-			"type":  "presence",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "presence",
+			"type":       "sensor",
+			"sensorType": "presence",
 		}).Set(presenceDetected)
 
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "battery",
-			"type":  "presence",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "battery",
+			"type":       "sensor",
+			"sensorType": "presence",
 		}).Set(sensor.Battery)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "on",
+			"type":       "sensor",
+			"sensorType": "presence",
+		}).Set(isOn)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "reachable",
+			"type":       "sensor",
+			"sensorType": "presence",
+		}).Set(isReachable)
 
 	case SENSOR_TYPE_TEMPERATURE:
 
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "temperature",
-			"type":  "temperature",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "temperature",
+			"type":       "sensor",
+			"sensorType": "temperature",
 		}).Set(sensor.Temperature)
 
-		metrics.HueSensorStateGauge.With(prometheus.Labels{
-			"name":  sensor.Name,
-			"state": "battery",
-			"type":  "temperature",
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "battery",
+			"type":       "sensor",
+			"sensorType": "temperature",
 		}).Set(sensor.Battery)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "on",
+			"type":       "sensor",
+			"sensorType": "temperature",
+		}).Set(isOn)
+
+		metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
+			"name":       sensor.Name,
+			"state":      "reachable",
+			"type":       "sensor",
+			"sensorType": "temperature",
+		}).Set(isReachable)
 
 	}
 }

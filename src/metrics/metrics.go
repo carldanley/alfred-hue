@@ -24,12 +24,12 @@ var (
 		[]string{"type"},
 	)
 
-	HueDeviceStateChangeCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
+	HueDeviceStateChangeGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
 			Name: "hue_device_state_change",
-			Help: "The number of times a HUE device has changed state",
+			Help: "The current value of a HUE device state",
 		},
-		[]string{"name", "type", "state"},
+		[]string{"name", "type", "state", "sensorType"},
 	)
 
 	HueEventsEmittedCounter = prometheus.NewCounterVec(
@@ -39,14 +39,6 @@ var (
 		},
 		[]string{"event", "type"},
 	)
-
-	HueSensorStateGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "hue_sensor_state",
-			Help: "The instantaneous value of various HUE sensors",
-		},
-		[]string{"name", "state", "type"},
-	)
 )
 
 func Startup(port int, log *logrus.Logger) {
@@ -54,9 +46,8 @@ func Startup(port int, log *logrus.Logger) {
 
 	prometheus.MustRegister(HueCacheUpdateLatencyMSHistogram)
 	prometheus.MustRegister(HueCacheUpdateErrorsCounter)
-	prometheus.MustRegister(HueDeviceStateChangeCounter)
+	prometheus.MustRegister(HueDeviceStateChangeGauge)
 	prometheus.MustRegister(HueEventsEmittedCounter)
-	prometheus.MustRegister(HueSensorStateGauge)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
