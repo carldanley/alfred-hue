@@ -129,14 +129,16 @@ func (hcs *HueCacheSystem) recordDeviceStateChangeCounter(light HueLight) {
 	}
 
 	metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
-		"name":  light.Name,
-		"type":  "light",
-		"state": "on",
+		"name":       light.Name,
+		"type":       "light",
+		"state":      "on",
+		"deviceType": "light",
 	}).Set(isOn)
 
 	metrics.HueDeviceStateChangeGauge.With(prometheus.Labels{
-		"name":  light.Name,
-		"type":  "light",
-		"state": "reachable",
+		"name":       light.Name,
+		"type":       "light",
+		"state":      "reachable",
+		"deviceType": "light",
 	}).Set(isReachable)
 }

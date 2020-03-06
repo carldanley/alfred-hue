@@ -29,7 +29,7 @@ var (
 			Name: "hue_device_state_change",
 			Help: "The current value of a HUE device state",
 		},
-		[]string{"name", "type", "state", "sensorType"},
+		[]string{"name", "type", "state", "deviceType"},
 	)
 
 	HueEventsEmittedCounter = prometheus.NewCounterVec(
