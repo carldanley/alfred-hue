@@ -37,6 +37,8 @@ I've tested all of the following Philips Hue Accessories with success:
 
 Here is a list of the events published to the event bus on state change:
 
+### Lights
+
 - `hue.light.name`
 - `hue.light.softwareVersion`
 - `hue.light.on`
@@ -51,6 +53,9 @@ Here is a list of the events published to the event bus on state change:
 - `hue.light.effect`
 - `hue.light.transitionTime`
 - `hue.light.colorMode`
+
+### Sensors
+
 - `hue.sensor.name`
 - `hue.sensor.softwareVersion`
 - `hue.sensor.on`
