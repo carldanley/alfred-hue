@@ -9,6 +9,7 @@ import (
 	"github.com/carldanley/homelab-hue/src/cache"
 	"github.com/carldanley/homelab-hue/src/config"
 	"github.com/carldanley/homelab-hue/src/events"
+	"github.com/carldanley/homelab-hue/src/handlers"
 	"github.com/carldanley/homelab-hue/src/metrics"
 	"github.com/sirupsen/logrus"
 )
@@ -51,6 +52,9 @@ func main() {
 	hueCacheSystem := cache.NewHueCacheSystem(cfg, log, eventSystem)
 	defer hueCacheSystem.Shutdown()
 
+	// register all of our HUE service subscriptions
+	handlers.Register(eventSystem, hueCacheSystem, log)
+
 	// begin processing events
 	go metrics.Startup(cfg.MetricsPort, log)
 	go eventSystem.Startup()
@@ -58,4 +62,7 @@ func main() {
 
 	// wait for an interrupt signal
 	<-signalChannel
+
+	// drain the event system
+	eventSystem.Drain()
 }

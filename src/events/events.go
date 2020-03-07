@@ -91,3 +91,12 @@ func (es *EventSystem) Publish(name, jsonPayload string) {
 		JSONPayload: jsonPayload,
 	}
 }
+
+func (es *EventSystem) Subscribe(subject string, handler nats.MsgHandler) {
+	es.bus.QueueSubscribe(subject, NATS_QUEUE_NAME, handler)
+}
+
+func (es *EventSystem) Drain() {
+	es.log.Info("Draining events...")
+	es.bus.Drain()
+}

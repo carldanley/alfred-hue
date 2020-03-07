@@ -1,6 +1,8 @@
 package cache
 
 import (
+	"errors"
+
 	"github.com/amimof/huego"
 	"github.com/carldanley/homelab-hue/src/metrics"
 	"github.com/prometheus/client_golang/prometheus"
@@ -141,4 +143,23 @@ func (hcs *HueCacheSystem) recordDeviceStateChangeCounter(light HueLight) {
 		"state":      "reachable",
 		"deviceType": "light",
 	}).Set(isReachable)
+}
+
+func (hcs *HueCacheSystem) GetLightById(id int) (HueLight, error) {
+	light, ok := hcs.lights[id]
+
+	if !ok {
+		return HueLight{}, errors.New("light does not exist in cache")
+	}
+
+	return light, nil
+}
+
+func (hcs *HueCacheSystem) SetLightStateById(id int, state huego.State) error {
+	_, err := hcs.bridge.SetLightState(id, state)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

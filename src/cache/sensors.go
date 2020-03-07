@@ -1,6 +1,8 @@
 package cache
 
 import (
+	"errors"
+
 	"github.com/amimof/huego"
 	"github.com/carldanley/homelab-hue/src/metrics"
 	"github.com/prometheus/client_golang/prometheus"
@@ -252,4 +254,14 @@ func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor Hu
 		}).Set(isReachable)
 
 	}
+}
+
+func (hcs *HueCacheSystem) GetSensorById(id int) (HueSensor, error) {
+	sensor, ok := hcs.sensors[id]
+
+	if !ok {
+		return HueSensor{}, errors.New("sensor does not exist in cache")
+	}
+
+	return sensor, nil
 }

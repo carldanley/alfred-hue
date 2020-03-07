@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"errors"
 	"time"
 
 	"github.com/amimof/huego"
@@ -63,24 +62,4 @@ func (hcs *HueCacheSystem) Startup() {
 			time.Sleep(time.Millisecond * time.Duration(CACHE_SYNC_INTERVAL_MS-elapsedTime))
 		}
 	}
-}
-
-func (hcs *HueCacheSystem) GetLightById(id int) (HueLight, error) {
-	light, ok := hcs.lights[id]
-
-	if !ok {
-		return HueLight{}, errors.New("light does not exist in cache")
-	}
-
-	return light, nil
-}
-
-func (hcs *HueCacheSystem) GetSensorById(id int) (HueSensor, error) {
-	sensor, ok := hcs.sensors[id]
-
-	if !ok {
-		return HueSensor{}, errors.New("sensor does not exist in cache")
-	}
-
-	return sensor, nil
 }
