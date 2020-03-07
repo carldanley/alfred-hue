@@ -66,5 +66,9 @@ steps:
     IMAGE_NAME: carldanley/homelab-hue
   commands:
   - printenv KUBE_CONFIG | base64 -d > /tmp/.kubeconfig
-  #- kubectl set image deployment/$DEPLOYMENT_NAME -n $NAMESPACE $CONTAINER_NAME=$IMAGE_NAME:$DRONE_TAG
-  - kubectl get nodes
+  - kubectl set image deployment/$DEPLOYMENT_NAME -n $NAMESPACE $CONTAINER_NAME=$IMAGE_NAME:$DRONE_TAG
+  when:
+    ref:
+    - refs/tags/*
+  depends_on:
+  - dockerize
