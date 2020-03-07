@@ -64,6 +64,7 @@ steps:
     CONTAINER_NAME: homelab-hue
     IMAGE_NAME: carldanley/homelab-hue
   commands:
+  - mkdir -p /.kube
   - printenv KUBE_CONFIG | base64 -d > /.kube/config
   #- kubectl set image deployment/$DEPLOYMENT_NAME -n $NAMESPACE $CONTAINER_NAME=$IMAGE_NAME:$DRONE_TAG
   - kubectl get nodes
