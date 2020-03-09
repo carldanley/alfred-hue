@@ -4,45 +4,40 @@ import (
 	"encoding/json"
 
 	"github.com/carldanley/homelab-hue/src/cache"
-	"github.com/nats-io/nats.go"
+	"github.com/carldanley/homelab-hue/src/events"
 	"github.com/sirupsen/logrus"
 )
+
+type HueLightGetHandler struct {
+	cache cache.HueCacheSystem
+	log   *logrus.Logger
+}
 
 type HueLightGetRequest struct {
 	ID int `json:"id"`
 }
 
-type HueLightGetErrorResponse struct {
-	Error string `json:"error"`
-}
-
-func HueLightGetHandler(cacheSystem cache.HueCacheSystem, log *logrus.Logger, msg *nats.Msg) {
-	log.WithFields(logrus.Fields{
-		"subject": msg.Subject,
-		"data":    string(msg.Data),
-	}).Println("received message")
-
+func (h *HueLightGetHandler) Process(message []byte) (string, error) {
 	var request HueLightGetRequest
 
-	if err := json.Unmarshal(msg.Data, &request); err != nil {
-		json, _ := json.Marshal(HueLightGetErrorResponse{
-			Error: "invalid JSON",
-		})
-
-		msg.Respond(json)
-		return
+	if err := json.Unmarshal(message, &request); err != nil {
+		return "", err
 	}
 
-	light, err := cacheSystem.GetLightById(request.ID)
+	light, err := h.cache.GetLightById(request.ID)
 	if err != nil {
-		json, _ := json.Marshal(HueLightGetErrorResponse{
-			Error: err.Error(),
-		})
-
-		msg.Respond(json)
-		return
+		return "", err
 	}
 
 	json, _ := json.Marshal(light)
-	msg.Respond(json)
+	return string(json), nil
+}
+
+func RegisterHueLightGetHandler(events events.EventSystem, cache cache.HueCacheSystem, log *logrus.Logger) {
+	handler := HueLightGetHandler{
+		cache: cache,
+		log:   log,
+	}
+
+	events.Subscribe("hue.light.get", &handler)
 }

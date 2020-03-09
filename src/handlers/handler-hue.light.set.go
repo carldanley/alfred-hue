@@ -5,50 +5,45 @@ import (
 
 	"github.com/amimof/huego"
 	"github.com/carldanley/homelab-hue/src/cache"
-	"github.com/nats-io/nats.go"
+	"github.com/carldanley/homelab-hue/src/events"
 	"github.com/sirupsen/logrus"
 )
+
+type HueLightSetHandler struct {
+	cache cache.HueCacheSystem
+	log   *logrus.Logger
+}
 
 type HueLightSetRequest struct {
 	ID    int         `json:"id"`
 	State huego.State `json:"state"`
 }
 
-type HueLightSetErrorResponse struct {
-	Error string `json:"error"`
-}
-
 type HueLightSetSuccessResponse struct {
 	Ok bool `json:"ok"`
 }
 
-func HueLightSetHandler(cacheSystem cache.HueCacheSystem, log *logrus.Logger, msg *nats.Msg) {
-	log.WithFields(logrus.Fields{
-		"subject": msg.Subject,
-		"data":    string(msg.Data),
-	}).Println("received message")
-
+func (h *HueLightSetHandler) Process(message []byte) (string, error) {
 	var request HueLightSetRequest
 
-	if err := json.Unmarshal(msg.Data, &request); err != nil {
-		json, _ := json.Marshal(HueLightGetErrorResponse{
-			Error: "invalid JSON",
-		})
-
-		msg.Respond(json)
-		return
+	if err := json.Unmarshal(message, &request); err != nil {
+		return "", err
 	}
 
-	err := cacheSystem.SetLightStateById(request.ID, request.State)
+	err := h.cache.SetLightStateById(request.ID, request.State)
 	if err != nil {
-		json, _ := json.Marshal(HueLightGetErrorResponse{
-			Error: "could not set light state",
-		})
-
-		msg.Respond(json)
-		return
+		return "", err
 	}
 
 	json, _ := json.Marshal(HueLightSetSuccessResponse{Ok: true})
-	msg.Respond(json)
+	return string(json), nil
+}
+
+func RegisterHueLightSetHandler(events events.EventSystem, cache cache.HueCacheSystem, log *logrus.Logger) {
+	handler := HueLightSetHandler{
+		cache: cache,
+		log:   log,
+	}
+
+	events.Subscribe("hue.light.set", &handler)
 }

@@ -15,3 +15,11 @@ type Event struct {
 	Name        string
 	JSONPayload string
 }
+
+type RequestHandler interface {
+	Process([]byte) (string, error)
+}
+
+type RequestHandlerError struct {
+	Error string `json:"error"`
+}

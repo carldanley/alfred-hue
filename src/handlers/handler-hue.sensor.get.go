@@ -4,45 +4,40 @@ import (
 	"encoding/json"
 
 	"github.com/carldanley/homelab-hue/src/cache"
-	"github.com/nats-io/nats.go"
+	"github.com/carldanley/homelab-hue/src/events"
 	"github.com/sirupsen/logrus"
 )
+
+type HueSensorGetHandler struct {
+	cache cache.HueCacheSystem
+	log   *logrus.Logger
+}
 
 type HueSensorGetRequest struct {
 	ID int `json:"id"`
 }
 
-type HueSensorGetErrorResponse struct {
-	Error string `json:"error"`
-}
-
-func HueSensorGetHandler(cacheSystem cache.HueCacheSystem, log *logrus.Logger, msg *nats.Msg) {
-	log.WithFields(logrus.Fields{
-		"subject": msg.Subject,
-		"data":    string(msg.Data),
-	}).Println("received message")
-
+func (h *HueSensorGetHandler) Process(message []byte) (string, error) {
 	var request HueSensorGetRequest
 
-	if err := json.Unmarshal(msg.Data, &request); err != nil {
-		json, _ := json.Marshal(HueSensorGetErrorResponse{
-			Error: "invalid JSON",
-		})
-
-		msg.Respond(json)
-		return
+	if err := json.Unmarshal(message, &request); err != nil {
+		return "", err
 	}
 
-	sensor, err := cacheSystem.GetSensorById(request.ID)
+	sensor, err := h.cache.GetSensorById(request.ID)
 	if err != nil {
-		json, _ := json.Marshal(HueSensorGetErrorResponse{
-			Error: err.Error(),
-		})
-
-		msg.Respond(json)
-		return
+		return "", err
 	}
 
 	json, _ := json.Marshal(sensor)
-	msg.Respond(json)
+	return string(json), nil
+}
+
+func RegisterHueSensorGetHandler(events events.EventSystem, cache cache.HueCacheSystem, log *logrus.Logger) {
+	handler := HueSensorGetHandler{
+		cache: cache,
+		log:   log,
+	}
+
+	events.Subscribe("hue.sensor.get", &handler)
 }

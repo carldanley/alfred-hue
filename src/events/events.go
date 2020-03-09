@@ -1,6 +1,7 @@
 package events
 
 import (
+	"encoding/json"
 	"regexp"
 	"time"
 
@@ -92,8 +93,48 @@ func (es *EventSystem) Publish(name, jsonPayload string) {
 	}
 }
 
-func (es *EventSystem) Subscribe(subject string, handler nats.MsgHandler) {
-	es.bus.QueueSubscribe(subject, NATS_QUEUE_NAME, handler)
+func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
+	es.bus.QueueSubscribe(subject, NATS_QUEUE_NAME, func(msg *nats.Msg) {
+		startTime := time.Now()
+
+		es.log.WithFields(logrus.Fields{
+			"subject": msg.Subject,
+			"data":    string(msg.Data),
+		}).Println("received message")
+
+		response, err := handler.Process(msg.Data)
+
+		if err != nil {
+			metrics.HueRequestsServicedCounter.With(prometheus.Labels{
+				"event":  subject,
+				"result": "failed",
+			}).Inc()
+
+			metrics.HueRequestLatencyMSHistogram.With(prometheus.Labels{
+				"event":  subject,
+				"result": "failed",
+			}).Observe(float64(time.Since(startTime).Milliseconds()))
+
+			json, _ := json.Marshal(RequestHandlerError{
+				Error: err.Error(),
+			})
+
+			msg.Respond(json)
+			return
+		}
+
+		metrics.HueRequestsServicedCounter.With(prometheus.Labels{
+			"event":  subject,
+			"result": "succeeded",
+		}).Inc()
+
+		metrics.HueRequestLatencyMSHistogram.With(prometheus.Labels{
+			"event":  subject,
+			"result": "succeeded",
+		}).Observe(float64(time.Since(startTime).Milliseconds()))
+
+		msg.Respond([]byte(response))
+	})
 }
 
 func (es *EventSystem) Drain() {
