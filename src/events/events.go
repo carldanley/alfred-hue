@@ -105,11 +105,6 @@ func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
 		response, err := handler.Process(msg.Data)
 
 		if err != nil {
-			metrics.HueRequestsServicedCounter.With(prometheus.Labels{
-				"event":  subject,
-				"result": "failed",
-			}).Inc()
-
 			metrics.HueRequestLatencyMSHistogram.With(prometheus.Labels{
 				"event":  subject,
 				"result": "failed",
@@ -122,11 +117,6 @@ func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
 			msg.Respond(json)
 			return
 		}
-
-		metrics.HueRequestsServicedCounter.With(prometheus.Labels{
-			"event":  subject,
-			"result": "succeeded",
-		}).Inc()
 
 		metrics.HueRequestLatencyMSHistogram.With(prometheus.Labels{
 			"event":  subject,

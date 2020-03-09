@@ -40,14 +40,6 @@ var (
 		[]string{"event", "type"},
 	)
 
-	HueRequestsServicedCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "hue_requests_serviced",
-			Help: "The number of HUE requests serviced",
-		},
-		[]string{"event", "result"},
-	)
-
 	HueRequestLatencyMSHistogram = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:    "hue_request_latency_ms",
@@ -65,7 +57,6 @@ func Startup(port int, log *logrus.Logger) {
 	prometheus.MustRegister(HueCacheUpdateErrorsCounter)
 	prometheus.MustRegister(HueDeviceStateChangeGauge)
 	prometheus.MustRegister(HueEventsEmittedCounter)
-	prometheus.MustRegister(HueRequestsServicedCounter)
 	prometheus.MustRegister(HueRequestLatencyMSHistogram)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
