@@ -6,6 +6,12 @@
 
 ![Grafana Metrics](./documentation/images/grafana-dashboard.png)
 
+## Miscellaneous Notes
+
+**It's recommended to run a single instance of homelab-hue.**
+
+Currently, `homelab-hue` uses an in-memory cache which limits the number of instances that should be run at a given time. Each instance of `homelab-hue` is capped at a maximum of 12 cache updates per second (1 cache update request per 83.3 ms). In my testing, I've found that each cache update usually takes ~150-160 ms (~6 requests per second). Adding multiple instances of `homelab-hue` will add additional stress to the Hue bridge in your infrastructure which may potentially cause the bridge to become less responsive (which in turn, inhibits the request latency for interacting with lights).
+
 ## Hardware Requirements
 
 ### Required
@@ -68,3 +74,11 @@ Here is a list of the events published to the event bus on state change:
 - `hue.sensor.daylight`
 - `hue.sensor.presence`
 - `hue.sensor.temperature`
+
+## NATS Requests Available
+
+Here is a list of the request events that `homelab-hue` listens for:
+
+- `hue.light.get`
+- `hue.light.set`
+- `hue.sensor.get`
