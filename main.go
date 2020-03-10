@@ -6,11 +6,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/carldanley/homelab-hue/src/cache"
-	"github.com/carldanley/homelab-hue/src/config"
-	"github.com/carldanley/homelab-hue/src/events"
-	"github.com/carldanley/homelab-hue/src/handlers"
-	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/carldanley/alfred-hue/src/cache"
+	"github.com/carldanley/alfred-hue/src/config"
+	"github.com/carldanley/alfred-hue/src/events"
+	"github.com/carldanley/alfred-hue/src/handlers"
+	"github.com/carldanley/alfred-hue/src/metrics"
 	"github.com/sirupsen/logrus"
 )
 

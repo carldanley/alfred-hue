@@ -1,4 +1,4 @@
-module github.com/carldanley/homelab-hue
+module github.com/carldanley/alfred-hue
 
 go 1.13
 

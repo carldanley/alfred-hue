@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/amimof/huego"
-	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/carldanley/alfred-hue/src/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

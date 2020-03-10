@@ -2,13 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hue
-  namespace: homelab
+  namespace: alfred
   labels:
-    app: hue
+    app: alfred
+    role: hue
 spec:
   selector:
     matchLabels:
-      app: hue
+      app: alfred
+      role: hue
   replicas: 1
   minReadySeconds: 5
   strategy:
@@ -16,7 +18,8 @@ spec:
   template:
     metadata:
       labels:
-        app: hue
+        app: alfred
+        role: hue
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9200"
@@ -25,8 +28,8 @@ spec:
         fsGroup: 1000
         runAsUser: 1000
       containers:
-      - name: homelab-hue
-        image: carldanley/homelab-hue:1
+      - name: hue
+        image: carldanley/alfred-hue:1
         imagePullPolicy: Always
         args:
         - -v=2

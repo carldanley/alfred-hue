@@ -7,6 +7,6 @@ RUN zip -r -0 /zoneinfo.zip .
 ENV ZONEINFO /zoneinfo.zip
 
 WORKDIR /
-ADD homelab-hue /bin/
+ADD alfred-hue /bin/
 
-ENTRYPOINT [ "/bin/homelab-hue" ]
+ENTRYPOINT [ "/bin/alfred-hue" ]

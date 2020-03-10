@@ -3,7 +3,7 @@ type: docker
 name: default
 
 workspace:
-  base: /go/src/github.com/carldanley/homelab-hue
+  base: /go/src/github.com/carldanley/alfred-hue
 
 platform:
   os: linux
@@ -29,7 +29,7 @@ steps:
     CGO_ENABLED: 0
     GOOS: linux
   commands:
-  - go build -a -installsuffix cgo -o homelab-hue
+  - go build -a -installsuffix cgo -o alfred-hue
   volumes:
   - name: gopath
     path: /go
@@ -43,7 +43,7 @@ steps:
   image: plugins/docker
   settings:
     auto_tag: true
-    repo: carldanley/homelab-hue
+    repo: carldanley/alfred-hue
     username:
       from_secret: docker_username
     password:
@@ -60,10 +60,10 @@ steps:
     KUBE_CONFIG:
       from_secret: kube_config
     KUBECONFIG: /tmp/.kubeconfig
-    NAMESPACE: homelab
+    NAMESPACE: alfred
     DEPLOYMENT_NAME: hue
-    CONTAINER_NAME: homelab-hue
-    IMAGE_NAME: carldanley/homelab-hue
+    CONTAINER_NAME: hue
+    IMAGE_NAME: carldanley/alfred-hue
   commands:
   - printenv KUBE_CONFIG | base64 -d > /tmp/.kubeconfig
   - kubectl set image deployment/$DEPLOYMENT_NAME -n $NAMESPACE $CONTAINER_NAME=$IMAGE_NAME:$DRONE_TAG

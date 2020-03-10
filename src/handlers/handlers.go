@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/carldanley/homelab-hue/src/cache"
-	"github.com/carldanley/homelab-hue/src/events"
+	"github.com/carldanley/alfred-hue/src/cache"
+	"github.com/carldanley/alfred-hue/src/events"
 	"github.com/sirupsen/logrus"
 )
 

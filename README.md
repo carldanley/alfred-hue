@@ -1,6 +1,6 @@
-# homelab-hue
+# alfred-hue
 
-[![Build Status](https://ci.encrypted.place/api/badges/carldanley/homelab-hue/status.svg)](https://ci.encrypted.place/carldanley/homelab-hue)
+[![Build Status](https://ci.encrypted.place/api/badges/carldanley/alfred-hue/status.svg)](https://ci.encrypted.place/carldanley/alfred-hue)
 
 > A project focused on exposing information about Philips Hue devices to an event bus.
 
@@ -8,9 +8,9 @@
 
 ## Miscellaneous Notes
 
-**It's recommended to run a single instance of homelab-hue.**
+**It's recommended to run a single instance of alfred-hue.**
 
-Currently, `homelab-hue` uses an in-memory cache which limits the number of instances that should be run at a given time. Each instance of `homelab-hue` is capped at a maximum of 12 cache updates per second (1 cache update request per 83.3 ms). In my testing, I've found that each cache update usually takes ~150-160 ms (~6 requests per second). Adding multiple instances of `homelab-hue` will add additional stress to the Hue bridge in your infrastructure which may potentially cause the bridge to become less responsive (which in turn, inhibits the request latency for interacting with lights).
+Currently, `alfred-hue` uses an in-memory cache which limits the number of instances that should be run at a given time. Each instance of `alfred-hue` is capped at a maximum of 12 cache updates per second (1 cache update request per 83.3 ms). In my testing, I've found that each cache update usually takes ~150-160 ms (~6 requests per second). Adding multiple instances of `alfred-hue` will add additional stress to the Hue bridge in your infrastructure which may potentially cause the bridge to become less responsive (which in turn, inhibits the request latency for interacting with lights).
 
 ## Hardware Requirements
 
@@ -35,7 +35,7 @@ I've tested all of the following Philips Hue Accessories with success:
 | Name | Description | Default Value |
 |:--|:--|:--|
 | `NATS_SERVER` | The NATS connection URL used when connecting to the NATS cluster/server. | `"nats://127.0.0.1:4222"` |
-| `HUE_BRIDGE_ADDRESS` | The host or IP address of the Philips Hue Bridge you're configured homelab-hue to connect to | `""` |
+| `HUE_BRIDGE_ADDRESS` | The host or IP address of the Philips Hue Bridge you're configured alfred-hue to connect to | `""` |
 | `HUE_USER_ID` | The generated Philips Hue User ID you acquire when pairing your application with the Philips Hue Bridge | `""` |
 | `METRICS_PORT` | The port that will be used for hosting the Prometheus metrics endpoint | `9200` |
 
@@ -77,7 +77,7 @@ Here is a list of the events published to the event bus on state change:
 
 ## NATS Requests Available
 
-Here is a list of the request events that `homelab-hue` listens for:
+Here is a list of the request events that `alfred-hue` listens for:
 
 - `hue.light.get`
 - `hue.light.set`

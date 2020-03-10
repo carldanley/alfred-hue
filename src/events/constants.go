@@ -1,3 +1,3 @@
 package events
 
-const NATS_QUEUE_NAME = "homelab-hue"
+const NATS_QUEUE_NAME = "alfred-hue"

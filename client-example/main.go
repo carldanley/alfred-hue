@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/carldanley/homelab-hue/src/config"
+	"github.com/carldanley/alfred-hue/src/config"
 	"github.com/nats-io/nats.go"
 	"github.com/sirupsen/logrus"
 )

@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/amimof/huego"
-	"github.com/carldanley/homelab-hue/src/config"
-	"github.com/carldanley/homelab-hue/src/events"
-	"github.com/carldanley/homelab-hue/src/metrics"
+	"github.com/carldanley/alfred-hue/src/config"
+	"github.com/carldanley/alfred-hue/src/events"
+	"github.com/carldanley/alfred-hue/src/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
