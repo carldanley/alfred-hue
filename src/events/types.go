@@ -6,9 +6,10 @@ import (
 )
 
 type EventSystem struct {
-	bus    *nats.Conn
-	log    *logrus.Logger
-	events chan Event
+	bus         *nats.Conn
+	log         *logrus.Logger
+	events      chan Event
+	eventPrefix string
 }
 
 type Event struct {

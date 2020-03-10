@@ -18,7 +18,7 @@ func init() {
 }
 
 func main() {
-	requestSubject := "hue.sensor.get"
+	requestSubject := "alfred.hue.sensor.get"
 	payloadToSend := `{"id": 16,"state": {"on": true,"bri":255,"sat":255,"colormode":"hs","hue":60566,"sat":22,"effect":"none"}}`
 
 	cfg, _ := config.GetConfig()

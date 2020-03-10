@@ -2,6 +2,7 @@ package events
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -14,8 +15,13 @@ import (
 
 func NewEventSystem(cfg config.Config, log *logrus.Logger) EventSystem {
 	system := EventSystem{
-		log:    log,
-		events: make(chan Event),
+		log:         log,
+		events:      make(chan Event),
+		eventPrefix: cfg.NatsEventPrefix,
+	}
+
+	if system.eventPrefix == "" {
+		system.eventPrefix = "alfred"
 	}
 
 	conn, err := nats.Connect(
@@ -86,14 +92,24 @@ func (es *EventSystem) Startup() {
 	}
 }
 
+func (es *EventSystem) GetEventName(name string) string {
+	if es.eventPrefix == "" {
+		return name
+	}
+
+	return fmt.Sprintf("%s.%s", es.eventPrefix, name)
+}
+
 func (es *EventSystem) Publish(name, jsonPayload string) {
 	es.events <- Event{
-		Name:        name,
+		Name:        es.GetEventName(name),
 		JSONPayload: jsonPayload,
 	}
 }
 
 func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
+	subject = es.GetEventName(subject)
+
 	es.bus.QueueSubscribe(subject, NATS_QUEUE_NAME, func(msg *nats.Msg) {
 		startTime := time.Now()
 
