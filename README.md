@@ -36,6 +36,7 @@ I've tested all of the following Philips Hue Accessories with success:
 |:--|:--|:--|
 | `NATS_SERVER` | The NATS connection URL used when connecting to the NATS cluster/server. | `"nats://127.0.0.1:4222"` |
 | `NATS_EVENT_PREFIX` | The event prefix that will be used when publishing or subscribing to events. | `alfred` |
+| `NATS_QUEUE_NAME` | The queue name that `alfred-hue` will subscribe to events on. | `alfred-hue` |
 | `HUE_BRIDGE_ADDRESS` | The host or IP address of the Philips Hue Bridge you're configured alfred-hue to connect to | `""` |
 | `HUE_USER_ID` | The generated Philips Hue User ID you acquire when pairing your application with the Philips Hue Bridge | `""` |
 | `METRICS_PORT` | The port that will be used for hosting the Prometheus metrics endpoint | `9200` |

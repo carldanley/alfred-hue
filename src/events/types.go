@@ -10,6 +10,7 @@ type EventSystem struct {
 	log         *logrus.Logger
 	events      chan Event
 	eventPrefix string
+	queueName   string
 }
 
 type Event struct {

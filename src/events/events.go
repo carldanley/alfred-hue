@@ -18,10 +18,15 @@ func NewEventSystem(cfg config.Config, log *logrus.Logger) EventSystem {
 		log:         log,
 		events:      make(chan Event),
 		eventPrefix: cfg.NatsEventPrefix,
+		queueName:   cfg.NatsQueueName,
 	}
 
 	if system.eventPrefix == "" {
 		system.eventPrefix = "alfred"
+	}
+
+	if system.queueName == "" {
+		system.queueName = "alfred-hue"
 	}
 
 	conn, err := nats.Connect(
@@ -110,7 +115,7 @@ func (es *EventSystem) Publish(name, jsonPayload string) {
 func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
 	subject = es.GetEventName(subject)
 
-	es.bus.QueueSubscribe(subject, NATS_QUEUE_NAME, func(msg *nats.Msg) {
+	es.bus.QueueSubscribe(subject, es.queueName, func(msg *nats.Msg) {
 		startTime := time.Now()
 
 		es.log.WithFields(logrus.Fields{
