@@ -79,8 +79,8 @@ func (es *EventSystem) Startup() {
 		if err := es.bus.Publish(event.Name, []byte(event.JSONPayload)); err != nil {
 			es.log.WithError(err).Warn("could not publish event to event bus")
 		} else {
-			isLight, _ := regexp.Match(`^hue.light.*`, []byte(event.Name))
-			isSensor, _ := regexp.Match(`^hue.sensor.*`, []byte(event.Name))
+			isLight, _ := regexp.Match(fmt.Sprintf("^%s.*", es.GetEventName("hue.light")), []byte(event.Name))
+			isSensor, _ := regexp.Match(fmt.Sprintf("^%s.*", es.GetEventName("hue.sensor")), []byte(event.Name))
 
 			if isLight {
 				metrics.HueEventsEmittedCounter.With(prometheus.Labels{
