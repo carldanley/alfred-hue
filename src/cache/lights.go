@@ -16,13 +16,13 @@ func (hcs *HueCacheSystem) updateLights() error {
 
 	for _, light := range lights {
 		new := hcs.convertHuegoLightToHueLight(light)
-		old, err := hcs.GetLightById(light.ID)
+		old, err := hcs.GetLightById(light.UniqueID)
 		json := new.ToJSON()
 
 		hcs.recordDeviceStateChangeCounter(new)
 
 		if err != nil {
-			hcs.lights[new.ID] = new
+			hcs.lights[new.UniqueID] = new
 			continue
 		}
 
@@ -92,7 +92,7 @@ func (hcs *HueCacheSystem) updateLights() error {
 			hcs.events.Publish("hue.light.colorMode", json)
 		}
 
-		hcs.lights[new.ID] = new
+		hcs.lights[new.UniqueID] = new
 	}
 
 	return nil
@@ -145,7 +145,27 @@ func (hcs *HueCacheSystem) recordDeviceStateChangeCounter(light HueLight) {
 	}).Set(isReachable)
 }
 
-func (hcs *HueCacheSystem) GetLightById(id int) (HueLight, error) {
+func (hcs *HueCacheSystem) GetLights() []HueLight {
+	lights := []HueLight{}
+
+	for _, light := range hcs.lights {
+		lights = append(lights, light)
+	}
+
+	return lights
+}
+
+func (hcs *HueCacheSystem) GetSensors() []HueSensor {
+	sensors := []HueSensor{}
+
+	for _, sensor := range hcs.sensors {
+		sensors = append(sensors, sensor)
+	}
+
+	return sensors
+}
+
+func (hcs *HueCacheSystem) GetLightById(id string) (HueLight, error) {
 	light, ok := hcs.lights[id]
 
 	if !ok {
@@ -155,9 +175,13 @@ func (hcs *HueCacheSystem) GetLightById(id int) (HueLight, error) {
 	return light, nil
 }
 
-func (hcs *HueCacheSystem) SetLightStateById(id int, state huego.State) error {
-	_, err := hcs.bridge.SetLightState(id, state)
+func (hcs *HueCacheSystem) SetLightStateById(id string, state huego.State) error {
+	light, err := hcs.GetLightById(id)
 	if err != nil {
+		return err
+	}
+
+	if _, err := hcs.bridge.SetLightState(light.ID, state); err != nil {
 		return err
 	}
 

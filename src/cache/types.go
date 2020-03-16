@@ -13,8 +13,8 @@ type HueCacheSystem struct {
 	log    *logrus.Logger
 	events events.EventSystem
 
-	lights       map[int]HueLight
-	sensors      map[int]HueSensor
+	lights       map[string]HueLight
+	sensors      map[string]HueSensor
 	shuttingDown bool
 }
 

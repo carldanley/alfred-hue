@@ -20,13 +20,13 @@ func (hcs *HueCacheSystem) updateSensors() error {
 		}
 
 		new := hcs.convertHuegoSensorToHueSensor(sensor)
-		old, err := hcs.GetSensorById(sensor.ID)
+		old, err := hcs.GetSensorById(sensor.UniqueID)
 		json := new.ToJSON()
 
 		hcs.recordSensorStateMetrics(sensor.Type, new)
 
 		if err != nil {
-			hcs.sensors[new.ID] = new
+			hcs.sensors[new.UniqueID] = new
 			continue
 		}
 
@@ -89,7 +89,7 @@ func (hcs *HueCacheSystem) updateSensors() error {
 
 		}
 
-		hcs.sensors[new.ID] = new
+		hcs.sensors[new.UniqueID] = new
 	}
 
 	return nil
@@ -256,7 +256,7 @@ func (hcs *HueCacheSystem) recordSensorStateMetrics(sensorType string, sensor Hu
 	}
 }
 
-func (hcs *HueCacheSystem) GetSensorById(id int) (HueSensor, error) {
+func (hcs *HueCacheSystem) GetSensorById(id string) (HueSensor, error) {
 	sensor, ok := hcs.sensors[id]
 
 	if !ok {

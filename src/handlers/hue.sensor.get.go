@@ -14,7 +14,7 @@ type HueSensorGetHandler struct {
 }
 
 type HueSensorGetRequest struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 func (h *HueSensorGetHandler) Process(message []byte) (string, error) {

@@ -17,8 +17,8 @@ func NewHueCacheSystem(cfg config.Config, log *logrus.Logger, events events.Even
 		log:    log,
 		events: events,
 
-		lights:       map[int]HueLight{},
-		sensors:      map[int]HueSensor{},
+		lights:       map[string]HueLight{},
+		sensors:      map[string]HueSensor{},
 		shuttingDown: false,
 	}
 

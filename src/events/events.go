@@ -149,6 +149,6 @@ func (es *EventSystem) Subscribe(subject string, handler RequestHandler) {
 }
 
 func (es *EventSystem) Drain() {
-	es.log.Info("Draining events...")
+	es.log.Info("draining events")
 	es.bus.Drain()
 }

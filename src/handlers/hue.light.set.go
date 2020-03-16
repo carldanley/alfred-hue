@@ -15,7 +15,7 @@ type HueLightSetHandler struct {
 }
 
 type HueLightSetRequest struct {
-	ID    int         `json:"id"`
+	ID    string      `json:"id"`
 	State huego.State `json:"state"`
 }
 
